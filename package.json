@@ -1,0 +1,9 @@
+{
+  "name": "spx-command-center",
+  "version": "2.0.0",
+  "description": "MESH SPX Trading Command Center",
+  "private": true,
+  "engines": {
+    "node": "18.x"
+  }
+}
