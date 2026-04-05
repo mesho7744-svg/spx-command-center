@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MESH SPX Command Center | مركز قيادة SPX</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #050a0f;
+      color: #e0e6ed;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, #0a1628 0%, #0d1f3c 100%);
+      border-bottom: 1px solid #1a3a5c;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-title h1 {
+      font-size: 22px;
+      color: #00d4ff;
+      letter-spacing: 1px;
+    }
+    .header-title p {
+      font-size: 13px;
+      color: #5a7a9a;
+      margin-top: 2px;
+    }
+    .header-right {
+      text-align: left;
+      font-size: 12px;
+      color: #5a7a9a;
+    }
+    .refresh-btn {
+      background: #0a2040;
+      border: 1px solid #1a4a7a;
+      color: #00d4ff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      margin-top: 6px;
+      transition: all 0.2s;
+    }
+    .refresh-btn:hover { background: #1a3a6a; }
+
+    /* ── JUDAS SWING ── */
+    .judas-bar {
+      padding: 10px 24px;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1a3a5c;
+    }
+    .judas-bar.active {
+      background: rgba(255, 170, 0, 0.1);
+      border-color: #ffaa00;
+      color: #ffaa00;
+    }
+    .judas-bar.inactive {
+      background: rgba(0, 212, 255, 0.05);
+      color: #5a7a9a;
+    }
+
+    /* ── GRID ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding: 16px 24px;
+    }
+    @media (max-width: 768px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: #0a1628;
+      border: 1px solid #1a3a5c;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .card-title {
+      font-size: 11px;
+      color: #5a7a9a;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ── PRICE ── */
+    .price-box {
+      background: #050f1f;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .price-label { font-size: 11px; color: #5a7a9a; margin-bottom: 4px; }
+    .price-value { font-size: 36px; color: #00d4ff; font-weight: 700; letter-spacing: 1px; }
+
+    /* ── GEX LEVELS ── */
+    .gex-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .gex-item {
+      background: #050f1f;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .gex-item-label { font-size: 10px; color: #5a7a9a; margin-bottom: 4px; }
+    .gex-item-value { font-size: 20px; font-weight: 700; }
+    .call-wall { color: #00c853; border-left: 3px solid #00c853; }
+    .put-wall  { color: #ff1744; border-left: 3px solid #ff1744; }
+    .zero-gamma { color: #ff9800; border-left: 3px solid #ff9800; }
+    .max-pain  { color: #29b6f6; border-left: 3px solid #29b6f6; }
+    .gamma-flip { color: #e040fb; border-left: 3px solid #e040fb; }
+
+    /* ── EXPECTED MOVE ── */
+    .move-box {
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .move-daily { background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.2); }
+    .move-weekly { background: rgba(224, 64, 251, 0.08); border: 1px solid rgba(224, 64, 251, 0.2); }
+    .move-title { font-size: 11px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .move-daily .move-title { color: #00d4ff; }
+    .move-weekly .move-title { color: #e040fb; }
+    .move-values { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .move-up, .move-down {
+      background: #050f1f;
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+    }
+    .move-up { border-top: 2px solid #00c853; }
+    .move-down { border-top: 2px solid #ff1744; }
+    .move-dir { font-size: 10px; color: #5a7a9a; }
+    .move-val { font-size: 18px; font-weight: 700; color: #e0e6ed; }
+
+    /* ── VOLATILITY ── */
+    .vix-big { font-size: 42px; font-weight: 700; color: #e0e6ed; }
+    .vix-change { font-size: 13px; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-top: 4px; }
+    .vix-label { font-size: 11px; color: #5a7a9a; margin-top: 4px; }
+
+    .iv-row { margin-top: 12px; }
+    .iv-label-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+    .iv-bar-bg { background: #050f1f; border-radius: 4px; height: 6px; overflow: hidden; }
+    .iv-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #00d4ff, #e040fb); }
+
+    .strategy-box {
+      margin-top: 12px;
+      background: rgba(224, 64, 251, 0.1);
+      border: 1px solid rgba(224, 64, 251, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .strategy-label { font-size: 10px; color: #5a7a9a; margin-bottom: 4px; }
+    .strategy-value { font-size: 16px; color: #e040fb; font-weight: 700; }
+    .strategy-ar { font-size: 13px; color: #a060c0; margin-top: 2px; }
+
+    /* ── MARKET BIAS ── */
+    .bias-box {
+      text-align: center;
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    .bias-neutral { background: rgba(90, 120, 150, 0.1); border: 1px solid rgba(90, 120, 150, 0.3); }
+    .bias-bullish { background: rgba(0, 200, 83, 0.1); border: 1px solid rgba(0, 200, 83, 0.3); }
+    .bias-bearish { background: rgba(255, 23, 68, 0.1); border: 1px solid rgba(255, 23, 68, 0.3); }
+    .bias-value { font-size: 28px; font-weight: 700; letter-spacing: 2px; }
+    .bias-ar { font-size: 16px; margin-top: 4px; }
+    .bias-neutral .bias-value, .bias-neutral .bias-ar { color: #90a0b0; }
+    .bias-bullish .bias-value, .bias-bullish .bias-ar { color: #00c853; }
+    .bias-bearish .bias-value, .bias-bearish .bias-ar { color: #ff1744; }
+    .bias-strength { font-size: 12px; color: #5a7a9a; margin-top: 6px; }
+    .bias-reason { font-size: 12px; color: #7a9ab0; margin-top: 8px; line-height: 1.5; }
+
+    /* ── SCENARIOS ── */
+    .scenario-item {
+      background: #050f1f;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .scenario-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .scenario-name { font-size: 13px; font-weight: 600; }
+    .scenario-prob { font-size: 16px; font-weight: 700; }
+    .scenario-bar-bg { background: #0a1628; border-radius: 4px; height: 4px; margin-bottom: 8px; overflow: hidden; }
+    .scenario-bar-fill { height: 100%; border-radius: 4px; }
+    .scenario-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; }
+    .scenario-target { color: #00c853; }
+    .scenario-stop { color: #ff1744; }
+
+    .bullish .scenario-name { color: #00c853; }
+    .bullish .scenario-prob { color: #00c853; }
+    .bullish .scenario-bar-fill { background: #00c853; }
+    .neutral-s .scenario-name { color: #90a0b0; }
+    .neutral-s .scenario-prob { color: #90a0b0; }
+    .neutral-s .scenario-bar-fill { background: #90a0b0; }
+    .bearish .scenario-name { color: #ff1744; }
+    .bearish .scenario-prob { color: #ff1744; }
+    .bearish .scenario-bar-fill { background: #ff1744; }
+
+    /* ── ECONOMIC CALENDAR ── */
+    .cal-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .cal-table th { color: #5a7a9a; padding: 6px 8px; text-align: right; border-bottom: 1px solid #1a3a5c; font-size: 11px; }
+    .cal-table td { padding: 8px; border-bottom: 1px solid #0a2040; }
+    .impact-high { background: rgba(255, 23, 68, 0.15); color: #ff1744; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+    .impact-medium { background: rgba(255, 152, 0, 0.15); color: #ff9800; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+    .impact-low { background: rgba(0, 200, 83, 0.15); color: #00c853; padding: 2px 8px; border-radius: 4px; font-size: 10px; }
+
+    /* ── LIQUIDITY ── */
+    .liq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .liq-item { background: #050f1f; border-radius: 8px; padding: 10px; text-align: center; }
+    .liq-label { font-size: 10px; color: #5a7a9a; margin-bottom: 4px; }
+    .liq-value { font-size: 18px; font-weight: 700; color: #e0e6ed; }
+
+    .key-levels { margin-top: 8px; }
+    .key-level-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #0a2040;
+      font-size: 13px;
+    }
+    .level-price { font-weight: 700; }
+    .level-name { color: #7a9ab0; font-size: 12px; }
+    .level-strength { font-size: 10px; padding: 2px 8px; border-radius: 4px; }
+    .strong { background: rgba(255, 170, 0, 0.15); color: #ffaa00; }
+    .moderate { background: rgba(90, 120, 150, 0.15); color: #90a0b0; }
+
+    /* ── PUT/CALL ── */
+    .pc-box {
+      background: #050f1f;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .pc-label { font-size: 11px; color: #5a7a9a; }
+    .pc-value { font-size: 24px; font-weight: 700; }
+    .pc-signal { font-size: 11px; margin-top: 2px; }
+
+    /* ── LOADING ── */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #5a7a9a;
+      font-size: 13px;
+      gap: 8px;
+    }
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid #1a3a5c;
+      border-top-color: #00d4ff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── FULL WIDTH CARD ── */
+    .full-width { grid-column: 1 / -1; }
+
+    /* ── DECISION BOX ── */
+    .decision-box {
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .decision-label { font-size: 11px; color: #5a7a9a; margin-bottom: 8px; }
+    .decision-value { font-size: 20px; font-weight: 700; color: #00d4ff; }
+    .decision-detail { font-size: 13px; color: #7a9ab0; margin-top: 6px; }
+
+    /* ── TRADE TODAY ── */
+    .trade-today {
+      padding: 10px 16px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .trade-yes { background: rgba(0, 200, 83, 0.1); border: 1px solid rgba(0, 200, 83, 0.3); color: #00c853; }
+    .trade-no { background: rgba(255, 23, 68, 0.1); border: 1px solid rgba(255, 23, 68, 0.3); color: #ff1744; }
+    .trade-caution { background: rgba(255, 152, 0, 0.1); border: 1px solid rgba(255, 152, 0, 0.3); color: #ff9800; }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding: 16px;
+      color: #2a4a6a;
+      font-size: 11px;
+      border-top: 1px solid #1a3a5c;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-title">
+    <h1>⚡ MESH SPX Command Center</h1>
+    <p>مركز قيادة SPX — نظام التداول اليومي</p>
+  </div>
+  <div class="header-right">
+    <div id="last-update">جاري التحميل...</div>
+    <div id="next-refresh"></div>
+    <button class="refresh-btn" onclick="loadAllData()">🔄 تحديث</button>
+  </div>
+</div>
+
+<!-- JUDAS SWING BAR -->
+<div class="judas-bar inactive" id="judas-bar">
+  <span id="judas-text">🛡 لا يوجد انحراف خادع (جوداس)</span>
+  <span id="judas-text-en">No Judas Swing detected</span>
+</div>
+
+<!-- MAIN GRID -->
+<div class="main-grid">
+
+  <!-- CARD 1: SPX KEY LEVELS -->
+  <div class="card">
+    <div class="card-title">
+      <span>SPX Key Levels</span>
+      <span>المستويات الرئيسية</span>
+    </div>
+
+    <div class="price-box">
+      <div class="price-label">CURRENT PRICE / السعر الحالي</div>
+      <div class="price-value" id="spx-price">
+        <div class="loading"><div class="spinner"></div> جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div class="gex-grid">
+      <div class="gex-item">
+        <div class="gex-item-label">MAX PAIN — الحد الأقصى للألم</div>
+        <div class="gex-item-value max-pain" id="max-pain">—</div>
+      </div>
+      <div class="gex-item">
+        <div class="gex-item-label">ZERO GAMMA — جاما الصفرية</div>
+        <div class="gex-item-value zero-gamma" id="zero-gamma">—</div>
+      </div>
+      <div class="gex-item">
+        <div class="gex-item-label">CALL WALL — حائط الشراء</div>
+        <div class="gex-item-value call-wall" id="call-wall">—</div>
+      </div>
+      <div class="gex-item">
+        <div class="gex-item-label">PUT WALL — حائط البيع</div>
+        <div class="gex-item-value put-wall" id="put-wall">—</div>
+      </div>
+    </div>
+
+    <div class="gex-item" style="margin-top:8px;">
+      <div class="gex-item-label">GAMMA FLIP — نقطة التحول</div>
+      <div class="gex-item-value gamma-flip" id="gamma-flip">—</div>
+    </div>
+
+    <!-- EXPECTED MOVE -->
+    <div style="margin-top:12px;">
+      <div class="move-box move-daily">
+        <div class="move-title">
+          <span>● DAILY EXPECTED MOVE</span>
+          <span>اليوم</span>
+        </div>
+        <div class="move-values">
+          <div class="move-up">
+            <div class="move-dir">↗ UPPER</div>
+            <div class="move-val" id="daily-upper">—</div>
+          </div>
+          <div class="move-down">
+            <div class="move-dir">↘ LOWER</div>
+            <div class="move-val" id="daily-lower">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="move-box move-weekly">
+        <div class="move-title">
+          <span>● WEEKLY EXPECTED MOVE</span>
+          <span>الأسبوعي</span>
+        </div>
+        <div class="move-values">
+          <div class="move-up">
+            <div class="move-dir">↗ UPPER</div>
+            <div class="move-val" id="weekly-upper">—</div>
+          </div>
+          <div class="move-down">
+            <div class="move-dir">↘ LOWER</div>
+            <div class="move-val" id="weekly-lower">—</div>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:11px;color:#5a7a9a;margin-top:6px;" id="exp-date"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2: VOLATILITY & IV -->
+  <div class="card">
+    <div class="card-title">
+      <span>Volatility & IV</span>
+      <span>التقلب والتقلب الضمني</span>
+    </div>
+
+    <div class="vix-big" id="vix-value">—</div>
+    <div>
+      <span class="vix-change" id="vix-change" style="background:rgba(90,120,150,0.2);color:#90a0b0;">0.00 (0.00%)</span>
+    </div>
+    <div class="vix-label">VIX LEVEL — مستوى مؤشر الخوف</div>
+
+    <div class="iv-row">
+      <div class="iv-label-row">
+        <span>IV RANK — رتبة التقلب الضمني</span>
+        <span id="iv-rank-val" style="color:#00d4ff;font-weight:700;">—</span>
+      </div>
+      <div class="iv-bar-bg">
+        <div class="iv-bar-fill" id="iv-rank-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="iv-row" style="margin-top:10px;">
+      <div class="iv-label-row">
+        <span>IV PERCENTILE — النسبة المئوية للتقلب</span>
+        <span id="iv-pct-val" style="color:#e040fb;font-weight:700;">—</span>
+      </div>
+      <div class="iv-bar-bg">
+        <div class="iv-bar-fill" id="iv-pct-bar" style="width:0%;background:linear-gradient(90deg,#e040fb,#ff1744)"></div>
+      </div>
+    </div>
+
+    <!-- PUT/CALL RATIO -->
+    <div class="pc-box" style="margin-top:12px;">
+      <div>
+        <div class="pc-label">PUT/CALL RATIO</div>
+        <div class="pc-value" id="pc-ratio">—</div>
+        <div class="pc-signal" id="pc-signal" style="color:#5a7a9a;">—</div>
+      </div>
+      <div style="font-size:28px;" id="pc-icon">📊</div>
+    </div>
+
+    <!-- STRATEGY -->
+    <div class="strategy-box">
+      <div class="strategy-label">STRATEGY RECOMMENDATION — الاستراتيجية الموصى بها</div>
+      <div class="strategy-value" id="strategy-en">—</div>
+      <div class="strategy-ar" id="strategy-ar">—</div>
+    </div>
+
+    <!-- GEX REGIME -->
+    <div style="margin-top:12px;padding:10px;border-radius:8px;" id="gex-regime-box">
+      <div style="font-size:11px;color:#5a7a9a;margin-bottom:4px;">GEX REGIME — نظام التعرض للجاما</div>
+      <div style="font-size:16px;font-weight:700;" id="gex-regime-text">—</div>
+    </div>
+  </div>
+
+  <!-- CARD 3: MARKET BIAS + DECISION -->
+  <div class="card">
+    <div class="card-title">
+      <span>Market Bias & Decision</span>
+      <span>اتجاه السوق والقرار</span>
+    </div>
+
+    <!-- TRADE TODAY -->
+    <div class="trade-today trade-yes" id="trade-today">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+
+    <!-- BIAS -->
+    <div class="bias-box bias-neutral" id="bias-box">
+      <div class="bias-value" id="bias-value">—</div>
+      <div class="bias-ar" id="bias-ar">—</div>
+      <div class="bias-strength" id="bias-strength">—</div>
+      <div class="bias-reason" id="bias-reason">—</div>
+    </div>
+
+    <!-- DECISION -->
+    <div class="decision-box">
+      <div class="decision-label">🎯 القرار الحاسم اليوم</div>
+      <div class="decision-value" id="decision-value">—</div>
+      <div class="decision-detail" id="decision-detail">—</div>
+    </div>
+
+    <!-- LIQUIDITY -->
+    <div class="card-title" style="margin-top:8px;">
+      <span>Liquidity Levels</span>
+      <span>مستويات السيولة</span>
+    </div>
+    <div class="liq-grid">
+      <div class="liq-item">
+        <div class="liq-label">PDH — أعلى أمس</div>
+        <div class="liq-value" id="pdh">—</div>
+      </div>
+      <div class="liq-item">
+        <div class="liq-label">PDL — أدنى أمس</div>
+        <div class="liq-value" id="pdl">—</div>
+      </div>
+      <div class="liq-item">
+        <div class="liq-label">WEEKLY HIGH</div>
+        <div class="liq-value" id="weekly-high">—</div>
+      </div>
+      <div class="liq-item">
+        <div class="liq-label">WEEKLY LOW</div>
+        <div class="liq-value" id="weekly-low">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 4: TRADING SCENARIOS -->
+  <div class="card">
+    <div class="card-title">
+      <span>Trading Scenarios</span>
+      <span>سيناريوهات التداول</span>
+    </div>
+    <div id="scenarios-container">
+      <div class="loading"><div class="spinner"></div> جاري التحميل...</div>
+    </div>
+  </div>
+
+  <!-- CARD 5: ECONOMIC CALENDAR — FULL WIDTH -->
+  <div class="card full-width">
+    <div class="card-title">
+      <span>📅 Economic Calendar</span>
+      <span>التقويم الاقتصادي</span>
+    </div>
+    <div id="calendar-container">
+      <div class="loading"><div class="spinner"></div> جاري التحميل...</div>
+    </div>
+  </div>
+
+  <!-- CARD 6: KEY LEVELS — FULL WIDTH -->
+  <div class="card full-width">
+    <div class="card-title">
+      <span>Key Support & Resistance</span>
+      <span>الدعم والمقاومة الرئيسية</span>
+    </div>
+    <div id="key-levels-container">
+      <div class="loading"><div class="spinner"></div> جاري التحميل...</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  MESH SPX Command Center v2.0 | بيانات حقيقية — تحديث تلقائي كل 15 دقيقة
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//   DATA FETCHING
+// ══════════════════════════════════════════════
+
+let refreshInterval;
+let nextRefreshTime;
+
+async function fetchMarketData() {
+  try {
+    const res = await fetch('/api/market-data');
+    if (!res.ok) throw new Error('API Error');
+    return await res.json();
+  } catch (err) {
+    console.error('Fetch error:', err);
+    return null;
+  }
+}
+
+// ══════════════════════════════════════════════
+//   UPDATE UI
+// ══════════════════════════════════════════════
+
+function fmt(n, dec = 2) {
+  if (!n && n !== 0) return '—';
+  return Number(n).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+
+function updateUI(data) {
+  if (!data) return;
+
+  // Time
+  const now = new Date();
+  document.getElementById('last-update').textContent = `آخر تحديث: ${now.toLocaleTimeString('ar-SA')}`;
+
+  // SPX Price
+  const price = data.spx?.price;
+  if (price) {
+    document.getElementById('spx-price').textContent = fmt(price);
+  }
+
+  // GEX Levels
+  document.getElementById('call-wall').textContent = fmt(data.gex?.callWall, 0) || '—';
+  document.getElementById('put-wall').textContent = fmt(data.gex?.putWall, 0) || '—';
+  document.getElementById('zero-gamma').textContent = fmt(data.gex?.zeroGamma, 0) || '—';
+  document.getElementById('max-pain').textContent = fmt(data.gex?.maxPain, 0) || '—';
+  document.getElementById('gamma-flip').textContent = fmt(data.gex?.gammaFlip, 0) || '—';
+
+  // Expected Move
+  document.getElementById('daily-upper').textContent = fmt(data.expectedMove?.dailyUpper, 0) || '—';
+  document.getElementById('daily-lower').textContent = fmt(data.expectedMove?.dailyLower, 0) || '—';
+  document.getElementById('weekly-upper').textContent = fmt(data.expectedMove?.weeklyUpper, 0) || '—';
+  document.getElementById('weekly-lower').textContent = fmt(data.expectedMove?.weeklyLower, 0) || '—';
+  if (data.expectedMove?.expDate) {
+    document.getElementById('exp-date').textContent = `EXP: ${data.expectedMove.expDate}`;
+  }
+
+  // VIX
+  const vix = data.vix?.value;
+  if (vix) {
+    document.getElementById('vix-value').textContent = fmt(vix, 2);
+    const change = data.vix?.change || 0;
+    const pct = data.vix?.changePct || 0;
+    const el = document.getElementById('vix-change');
+    el.textContent = `${change >= 0 ? '↑' : '↓'} ${fmt(Math.abs(change), 2)} (${fmt(Math.abs(pct), 2)}%)`;
+    el.style.background = change >= 0 ? 'rgba(255,23,68,0.15)' : 'rgba(0,200,83,0.15)';
+    el.style.color = change >= 0 ? '#ff1744' : '#00c853';
+  }
+
+  // IV Rank
+  const ivRank = data.iv?.rank || 0;
+  const ivPct = data.iv?.percentile || 0;
+  document.getElementById('iv-rank-val').textContent = `${fmt(ivRank, 1)}%`;
+  document.getElementById('iv-rank-bar').style.width = `${Math.min(ivRank, 100)}%`;
+  document.getElementById('iv-pct-val').textContent = `${fmt(ivPct, 1)}%`;
+  document.getElementById('iv-pct-bar').style.width = `${Math.min(ivPct, 100)}%`;
+
+  // Strategy
+  const strategies = {
+    'no_trade':    { en: 'Do Not Trade', ar: 'لا تتداول اليوم' },
+    'cs_narrow':   { en: 'Credit Spread Narrow', ar: 'سبريد ائتماني ضيق' },
+    'iron_condor': { en: 'Iron Condor', ar: 'آيرون كوندور' },
+    'ic_wide':     { en: 'Iron Condor Wide', ar: 'آيرون كوندور واسع' },
+    'iron_fly':    { en: 'Iron Fly', ar: 'آيرون فلاي' },
+  };
+  const strat = strategies[data.strategy] || { en: data.strategy || '—', ar: '—' };
+  document.getElementById('strategy-en').textContent = strat.en;
+  document.getElementById('strategy-ar').textContent = strat.ar;
+
+  // Put/Call Ratio
+  const pc = data.putCall?.ratio;
+  if (pc) {
+    document.getElementById('pc-ratio').textContent = fmt(pc, 2);
+    let signal, icon;
+    if (pc > 1.2) { signal = '🐻 تشاؤم شديد — Extreme Bearish'; icon = '😱'; }
+    else if (pc > 0.9) { signal = '🐻 تشاؤم — Bearish Sentiment'; icon = '📉'; }
+    else if (pc < 0.6) { signal = '🐂 تفاؤل مفرط — Extreme Bullish'; icon = '🚀'; }
+    else if (pc < 0.75) { signal = '🐂 تفاؤل — Bullish Sentiment'; icon = '📈'; }
+    else { signal = '⚖️ محايد — Neutral'; icon = '📊'; }
+    document.getElementById('pc-signal').textContent = signal;
+    document.getElementById('pc-icon').textContent = icon;
+  }
+
+  // GEX Regime
+  const regime = data.gex?.regime;
+  const regimeBox = document.getElementById('gex-regime-box');
+  const regimeText = document.getElementById('gex-regime-text');
+  if (regime === 'negative') {
+    regimeBox.style.background = 'rgba(255,23,68,0.08)';
+    regimeBox.style.border = '1px solid rgba(255,23,68,0.2)';
+    regimeText.textContent = '🔴 Negative Gamma — تقلب مرتفع';
+    regimeText.style.color = '#ff1744';
+  } else {
+    regimeBox.style.background = 'rgba(0,200,83,0.08)';
+    regimeBox.style.border = '1px solid rgba(0,200,83,0.2)';
+    regimeText.textContent = '🟢 Positive Gamma — استقرار';
+    regimeText.style.color = '#00c853';
+  }
+
+  // Market Bias
+  const bias = data.bias?.direction || 'neutral';
+  const biasBox = document.getElementById('bias-box');
+  biasBox.className = `bias-box bias-${bias}`;
+  const biasMap = {
+    bullish: { en: 'BULLISH', ar: '📈 صاعد' },
+    bearish: { en: 'BEARISH', ar: '📉 هابط' },
+    neutral: { en: 'NEUTRAL', ar: '⚖️ محايد' },
+  };
+  document.getElementById('bias-value').textContent = biasMap[bias]?.en || 'NEUTRAL';
+  document.getElementById('bias-ar').textContent = biasMap[bias]?.ar || '⚖️ محايد';
+  document.getElementById('bias-strength').textContent = `STRENGTH ${data.bias?.strength || 0}%  القوة`;
+  document.getElementById('bias-reason').textContent = data.bias?.reason || '';
+
+  // Trade Today
+  const tradeTodayEl = document.getElementById('trade-today');
+  const events = data.calendar?.filter(e => e.impact === 'HIGH') || [];
+  const ivLow = ivRank < 20;
+  if (events.length > 0 || ivLow) {
+    tradeTodayEl.className = 'trade-today trade-no';
+    tradeTodayEl.textContent = events.length > 0
+      ? `⚠️ تحذير — أخبار عالية التأثير اليوم | High Impact Event`
+      : `⚠️ IV منخفض جداً — لا تتداول | IV Too Low`;
+  } else {
+    tradeTodayEl.className = 'trade-today trade-yes';
+    tradeTodayEl.textContent = '✅ تداول اليوم — الظروف مناسبة | Trade Today';
+  }
+
+  // Decision
+  const dec = data.decision;
+  if (dec) {
+    document.getElementById('decision-value').textContent = dec.action || '—';
+    document.getElementById('decision-detail').textContent = dec.detail || '—';
+  }
+
+  // Judas Swing
+  const judasBar = document.getElementById('judas-bar');
+  const isJudas = data.judas?.active;
+  judasBar.className = `judas-bar ${isJudas ? 'active' : 'inactive'}`;
+  document.getElementById('judas-text').textContent = isJudas
+    ? '⚠️ تحذير انحراف خادع (جوداس) — انتظر تأكيداً'
+    : '🛡 لا يوجد انحراف خادع (جوداس)';
+  document.getElementById('judas-text-en').textContent = isJudas
+    ? 'JUDAS SWING ACTIVE — Wait for confirmation'
+    : 'No Judas Swing detected';
+
+  // Liquidity
+  document.getElementById('pdh').textContent = fmt(data.liquidity?.pdh, 2) || '—';
+  document.getElementById('pdl').textContent = fmt(data.liquidity?.pdl, 2) || '—';
+  document.getElementById('weekly-high').textContent = fmt(data.liquidity?.weeklyHigh, 2) || '—';
+  document.getElementById('weekly-low').textContent = fmt(data.liquidity?.weeklyLow, 2) || '—';
+
+  // Scenarios
+  renderScenarios(data.scenarios);
+
+  // Calendar
+  renderCalendar(data.calendar);
+
+  // Key Levels
+  renderKeyLevels(data);
+}
+
+function renderScenarios(scenarios) {
+  const container = document.getElementById('scenarios-container');
+  if (!scenarios?.length) {
+    container.innerHTML = '<div class="loading">لا توجد بيانات</div>';
+    return;
+  }
+  container.innerHTML = scenarios.map(s => `
+    <div class="scenario-item ${s.type}">
+      <div class="scenario-header">
+        <span class="scenario-name">${s.icon} ${s.name} — ${s.nameAr}</span>
+        <span class="scenario-prob">${s.prob}%</span>
+      </div>
+      <div class="scenario-bar-bg">
+        <div class="scenario-bar-fill" style="width:${s.prob}%"></div>
+      </div>
+      <div class="scenario-details">
+        <div class="scenario-target">🎯 Target: ${fmt(s.target, 0)}</div>
+        <div class="scenario-stop">🛑 Stop: ${fmt(s.stop, 0)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderCalendar(events) {
+  const container = document.getElementById('calendar-container');
+  if (!events?.length) {
+    container.innerHTML = '<div style="color:#5a7a9a;padding:12px;text-align:center;font-size:13px;">✅ لا توجد أحداث اقتصادية مهمة</div>';
+    return;
+  }
+  container.innerHTML = `
+    <table class="cal-table">
+      <thead>
+        <tr>
+          <th>التاريخ/الوقت</th>
+          <th>الحدث</th>
+          <th>التأثير</th>
+          <th>السابق / المتوقع</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${events.map(e => `
+          <tr>
+            <td style="color:#7a9ab0;">${e.date}</td>
+            <td>
+              <div style="font-weight:600;">${e.name}</div>
+              <div style="color:#5a7a9a;font-size:11px;">${e.nameAr || ''}</div>
+            </td>
+            <td><span class="impact-${e.impact.toLowerCase()}">${e.impact}</span></td>
+            <td style="color:#7a9ab0;">${e.prev || '—'} / ${e.est || '—'}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderKeyLevels(data) {
+  const container = document.getElementById('key-levels-container');
+  const levels = [];
+
+  if (data.gex?.callWall) levels.push({ price: data.gex.callWall, name: 'Call Wall / Major Resistance', nameAr: 'جدار الشراء — مقاومة رئيسية', color: '#00c853', strength: 'strong' });
+  if (data.liquidity?.pdh) levels.push({ price: data.liquidity.pdh, name: 'Previous Day High (PDH)', nameAr: 'أعلى مستوى أمس', color: '#ff9800', strength: 'moderate' });
+  if (data.gex?.maxPain) levels.push({ price: data.gex.maxPain, name: 'Max Pain / Magnet Level', nameAr: 'نقطة الألم الأقصى', color: '#29b6f6', strength: 'strong' });
+  if (data.liquidity?.pdl) levels.push({ price: data.liquidity.pdl, name: 'Previous Day Low (PDL)', nameAr: 'أدنى مستوى أمس', color: '#29b6f6', strength: 'moderate' });
+  if (data.gex?.zeroGamma) levels.push({ price: data.gex.zeroGamma, name: 'Zero-Gamma Level', nameAr: 'مستوى الجاما الصفرية', color: '#ff9800', strength: 'moderate' });
+  if (data.gex?.gammaFlip) levels.push({ price: data.gex.gammaFlip, name: 'Gamma Flip Level', nameAr: 'نقطة تحول الجاما', color: '#e040fb', strength: 'strong' });
+  if (data.gex?.putWall) levels.push({ price: data.gex.putWall, name: 'Put Wall / Major Support', nameAr: 'جدار البيع — دعم رئيسي', color: '#ff1744', strength: 'strong' });
+
+  levels.sort((a, b) => b.price - a.price);
+
+  container.innerHTML = levels.map(l => `
+    <div class="key-level-row">
+      <span class="level-price" style="color:${l.color}">${fmt(l.price, 0)}</span>
+      <div>
+        <div style="font-size:13px;">${l.name}</div>
+        <div class="level-name">${l.nameAr}</div>
+      </div>
+      <span class="level-strength ${l.strength}">${l.strength.toUpperCase()}</span>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════
+//   REFRESH TIMER
+// ══════════════════════════════════════════════
+
+function startRefreshTimer() {
+  clearInterval(refreshInterval);
+  nextRefreshTime = Date.now() + 15 * 60 * 1000;
+
+  refreshInterval = setInterval(() => {
+    const remaining = Math.max(0, nextRefreshTime - Date.now());
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    document.getElementById('next-refresh').textContent =
+      `التحديث القادم: ${mins}:${secs.toString().padStart(2, '0')}`;
+
+    if (remaining <= 0) {
+      loadAllData();
+    }
+  }, 1000);
+}
+
+// ══════════════════════════════════════════════
+//   MAIN LOAD
+// ══════════════════════════════════════════════
+
+async function loadAllData() {
+  startRefreshTimer();
+  const data = await fetchMarketData();
+  if (data) {
+    updateUI(data);
+  } else {
+    document.getElementById('spx-price').textContent = 'خطأ في التحميل';
+  }
+}
+
+// Init
+loadAllData();
+</script>
+</body>
+</html>
