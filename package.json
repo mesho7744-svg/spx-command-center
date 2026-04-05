@@ -4,6 +4,6 @@
   "description": "MESH SPX Trading Command Center",
   "private": true,
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   }
 }
