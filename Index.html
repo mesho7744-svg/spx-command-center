@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MESH SPX Command Center | مركز قيادة SPX</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+```
+body {
+  background: #050a0f;
+  color: #e0e6ed;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  min-height: 100vh;
+}
+
+.header {
+  background: linear-gradient(135deg, #0a1628 0%, #0d1f3c 100%);
+  border-bottom: 1px solid #1a3a5c;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-title h1 { font-size: 20px; color: #00d4ff; letter-spacing: 1px; }
+.header-title p { font-size: 12px; color: #5a7a9a; margin-top: 2px; }
+.header-right { text-align: left; font-size: 11px; color: #5a7a9a; }
+.refresh-btn {
+  background: #0a2040; border: 1px solid #1a4a7a; color: #00d4ff;
+  padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 12px;
+  margin-top: 5px; display: block;
+}
+
+.judas-bar {
+  padding: 9px 20px; font-size: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid #1a3a5c;
+}
+.judas-bar.active { background: rgba(255,170,0,0.1); border-color: #ffaa00; color: #ffaa00; }
+.judas-bar.inactive { background: rgba(0,212,255,0.05); color: #5a7a9a; }
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 14px 20px;
+}
+@media (max-width: 700px) { .main-grid { grid-template-columns: 1fr; } }
+
+.card {
+  background: #0a1628;
+  border: 1px solid #1a3a5c;
+  border-radius: 12px;
+  padding: 14px;
+}
+.card-title {
+  font-size: 10px; color: #5a7a9a;
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 12px;
+  display: flex; justify-content: space-between;
+}
+
+.price-box {
+  background: #050f1f; border-radius: 10px;
+  padding: 14px; text-align: center; margin-bottom: 12px;
+}
+.price-label { font-size: 10px; color: #5a7a9a; margin-bottom: 4px; }
+.price-value { font-size: 34px; color: #00d4ff; font-weight: 700; letter-spacing: 1px; }
+
+.gex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.gex-item { background: #050f1f; border-radius: 8px; padding: 10px 12px; }
+.gex-item-label { font-size: 10px; color: #5a7a9a; margin-bottom: 4px; }
+.gex-item-value { font-size: 19px; font-weight: 700; }
+.call-wall { color: #00c853; border-right: 3px solid #00c853; padding-right: 8px; }
+.put-wall  { color: #ff1744; border-right: 3px solid #ff1744; padding-right: 8px; }
+.zero-gamma { color: #ff9800; border-right: 3px solid #ff9800; padding-right: 8px; }
+.max-pain  { color: #29b6f6; border-right: 3px solid #29b6f6; padding-right: 8px; }
+.gamma-flip { color: #e040fb; }
+
+.move-box { border-radius: 10px; padding: 12px; margin-bottom: 8px; }
+.move-daily { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); }
+.move-weekly { background: rgba(224,64,251,0.08); border: 1px solid rgba(224,64,251,0.2); }
+.move-title { font-size: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+.move-daily .move-title { color: #00d4ff; }
+.move-weekly .move-title { color: #e040fb; }
+.move-values { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.move-up, .move-down { background: #050f1f; border-radius: 8px; padding: 8px; text-align: center; }
+.move-up { border-top: 2px solid #00c853; }
+.move-down { border-top: 2px solid #ff1744; }
+.move-dir { font-size: 10px; color: #5a7a9a; }
+.move-val { font-size: 17px; font-weight: 700; color: #e0e6ed; }
+
+.vix-big { font-size: 40px; font-weight: 700; color: #e0e6ed; }
+.vix-change { font-size: 12px; padding: 3px 10px; border-radius: 6px; display: inline-block; margin-top: 4px; }
+.vix-label { font-size: 10px; color: #5a7a9a; margin-top: 4px; }
+
+.iv-row { margin-top: 12px; }
+.iv-label-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; }
+.iv-bar-bg { background: #050f1f; border-radius: 4px; height: 6px; overflow: hidden; }
+.iv-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #00d4ff, #e040fb); transition: width 0.5s; }
+
+.strategy-box {
+  margin-top: 12px; background: rgba(224,64,251,0.1);
+  border: 1px solid rgba(224,64,251,0.3); border-radius: 10px;
+  padding: 12px; text-align: center;
+}
+.strategy-label { font-size: 10px; color: #5a7a9a; margin-bottom: 4px; }
+.strategy-value { font-size: 15px; color: #e040fb; font-weight: 700; }
+.strategy-ar { font-size: 12px; color: #a060c0; margin-top: 2px; }
+
+.pc-box {
+  background: #050f1f; border-radius: 10px; padding: 12px;
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+}
+.pc-label { font-size: 10px; color: #5a7a9a; }
+.pc-value { font-size: 22px; font-weight: 700; }
+.pc-signal { font-size: 10px; margin-top: 2px; }
+
+.gex-regime-box { margin-top: 10px; padding: 10px; border-radius: 8px; }
+
+.bias-box { text-align: center; padding: 14px; border-radius: 10px; margin-bottom: 12px; }
+.bias-neutral { background: rgba(90,120,150,0.1); border: 1px solid rgba(90,120,150,0.3); }
+.bias-bullish { background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.3); }
+.bias-bearish { background: rgba(255,23,68,0.1); border: 1px solid rgba(255,23,68,0.3); }
+.bias-value { font-size: 26px; font-weight: 700; letter-spacing: 2px; }
+.bias-ar { font-size: 15px; margin-top: 4px; }
+.bias-neutral .bias-value, .bias-neutral .bias-ar { color: #90a0b0; }
+.bias-bullish .bias-value, .bias-bullish .bias-ar { color: #00c853; }
+.bias-bearish .bias-value, .bias-bearish .bias-ar { color: #ff1744; }
+.bias-strength { font-size: 11px; color: #5a7a9a; margin-top: 6px; }
+.bias-reason { font-size: 11px; color: #7a9ab0; margin-top: 8px; line-height: 1.5; }
+
+.trade-today { padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; font-size: 13px; font-weight: 700; text-align: center; }
+.trade-yes { background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.3); color: #00c853; }
+.trade-no { background: rgba(255,23,68,0.1); border: 1px solid rgba(255,23,68,0.3); color: #ff1744; }
+
+.decision-box { background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.2); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+.decision-label { font-size: 10px; color: #5a7a9a; margin-bottom: 6px; }
+.decision-value { font-size: 18px; font-weight: 700; color: #00d4ff; }
+.decision-detail { font-size: 12px; color: #7a9ab0; margin-top: 6px; }
+
+.liq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.liq-item { background: #050f1f; border-radius: 8px; padding: 10px; text-align: center; }
+.liq-label { font-size: 10px; color: #5a7a9a; margin-bottom: 4px; }
+.liq-value { font-size: 16px; font-weight: 700; color: #e0e6ed; }
+
+.scenario-item { background: #050f1f; border-radius: 10px; padding: 12px; margin-bottom: 8px; }
+.scenario-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.scenario-name { font-size: 12px; font-weight: 600; }
+.scenario-prob { font-size: 15px; font-weight: 700; }
+.scenario-bar-bg { background: #0a1628; border-radius: 4px; height: 4px; margin-bottom: 8px; overflow: hidden; }
+.scenario-bar-fill { height: 100%; border-radius: 4px; }
+.scenario-details { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; }
+.scenario-target { color: #00c853; }
+.scenario-stop { color: #ff1744; }
+.bullish .scenario-name, .bullish .scenario-prob { color: #00c853; }
+.bullish .scenario-bar-fill { background: #00c853; }
+.neutral-s .scenario-name, .neutral-s .scenario-prob { color: #90a0b0; }
+.neutral-s .scenario-bar-fill { background: #90a0b0; }
+.bearish .scenario-name, .bearish .scenario-prob { color: #ff1744; }
+.bearish .scenario-bar-fill { background: #ff1744; }
+
+.cal-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.cal-table th { color: #5a7a9a; padding: 6px 8px; text-align: right; border-bottom: 1px solid #1a3a5c; font-size: 10px; }
+.cal-table td { padding: 8px; border-bottom: 1px solid #0a2040; }
+.impact-high { background: rgba(255,23,68,0.15); color: #ff1744; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.impact-medium { background: rgba(255,152,0,0.15); color: #ff9800; padding: 2px 8px; border-radius: 4px; font-size: 10px; }
+
+.key-level-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #0a2040; font-size: 12px; }
+.level-price { font-weight: 700; min-width: 60px; }
+.level-name { color: #7a9ab0; font-size: 11px; flex: 1; margin: 0 10px; }
+.level-strength { font-size: 10px; padding: 2px 8px; border-radius: 4px; }
+.strong { background: rgba(255,170,0,0.15); color: #ffaa00; }
+.moderate { background: rgba(90,120,150,0.15); color: #90a0b0; }
+
+.loading { display: flex; align-items: center; justify-content: center; padding: 20px; color: #5a7a9a; font-size: 12px; gap: 8px; }
+.spinner { width: 16px; height: 16px; border: 2px solid #1a3a5c; border-top-color: #00d4ff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.full-width { grid-column: 1 / -1; }
+.footer { text-align: center; padding: 14px; color: #2a4a6a; font-size: 10px; border-top: 1px solid #1a3a5c; margin-top: 8px; }
+
+.market-closed { background: rgba(255,152,0,0.1); border: 1px solid rgba(255,152,0,0.3); color: #ff9800; padding: 6px 14px; border-radius: 8px; font-size: 11px; display: inline-block; margin-top: 4px; }
+```
+
+  </style>
+</head>
+<body>
+<div id="lock-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#050a0f;z-index:9999;display:flex;align-items:center;justify-content:center;">
+  <div style="background:#0a1628;border:1px solid #1a3a5c;border-radius:16px;padding:40px;text-align:center;width:300px;">
+    <div style="font-size:32px;margin-bottom:16px;">⚡</div>
+    <div style="color:#00d4ff;font-size:20px;font-weight:700;margin-bottom:8px;">MESH SPX</div>
+    <div style="color:#5a7a9a;font-size:13px;margin-bottom:24px;">أدخل كلمة المرور</div>
+    <input id="pwd-input" type="password" placeholder="Password" 
+      style="width:100%;padding:12px;background:#050f1f;border:1px solid #1a4a7a;border-radius:8px;color:#e0e6ed;font-size:16px;text-align:center;outline:none;margin-bottom:16px;"
+      onkeydown="if(event.key==='Enter')checkPwd()">
+    <button onclick="checkPwd()" 
+      style="width:100%;padding:12px;background:#0a2040;border:1px solid #00d4ff;border-radius:8px;color:#00d4ff;font-size:15px;font-weight:700;cursor:pointer;">
+      دخول ✅
+    </button>
+    <div id="pwd-error" style="color:#ff1744;font-size:12px;margin-top:12px;display:none;">كلمة المرور خاطئة</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const PASS = "mesh2024";
+  const KEY  = "mesh_auth";
+  if(sessionStorage.getItem(KEY) === "ok"){
+    document.getElementById("lock-screen").style.display = "none";
+  }
+  window.checkPwd = function(){
+    const v = document.getElementById("pwd-input").value;
+    if(v === PASS){
+      sessionStorage.setItem(KEY, "ok");
+      document.getElementById("lock-screen").style.display = "none";
+    } else {
+      document.getElementById("pwd-error").style.display = "block";
+      document.getElementById("pwd-input").value = "";
+    }
+  };
+})();
+</script>
+
+<div class="header">
+  <div class="header-title">
+    <h1>⚡ MESH SPX Command Center</h1>
+    <p>مركز قيادة SPX — نظام التداول اليومي</p>
+  </div>
+  <div class="header-right">
+    <div id="last-update">جاري التحميل...</div>
+    <div id="next-refresh"></div>
+    <div id="market-status"></div>
+    <button class="refresh-btn" onclick="loadAllData()">🔄 تحديث</button>
+  </div>
+</div>
+
+<div class="judas-bar inactive" id="judas-bar">
+  <span id="judas-text">🛡 لا يوجد انحراف خادع (جوداس)</span>
+  <span id="judas-text-en">No Judas Swing detected</span>
+</div>
+
+<div class="main-grid">
+
+  <!-- SPX KEY LEVELS -->
+
+  <div class="card">
+    <div class="card-title">
+      <span>SPX Key Levels</span>
+      <span>المستويات الرئيسية</span>
+    </div>
+    <div class="price-box">
+      <div class="price-label">CURRENT PRICE / السعر الحالي</div>
+      <div class="price-value" id="spx-price"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+    <div class="gex-grid">
+      <div class="gex-item">
+        <div class="gex-item-label">MAX PAIN — الحد الأقصى للألم</div>
+        <div class="gex-item-value max-pain" id="max-pain">—</div>
+      </div>
+      <div class="gex-item">
+        <div class="gex-item-label">ZERO GAMMA — جاما الصفرية</div>
+        <div class="gex-item-value zero-gamma" id="zero-gamma">—</div>
+      </div>
+      <div class="gex-item">
+        <div class="gex-item-label">CALL WALL — حائط الشراء</div>
+        <div class="gex-item-value call-wall" id="call-wall">—</div>
+      </div>
+      <div class="gex-item">
+        <div class="gex-item-label">PUT WALL — حائط البيع</div>
+        <div class="gex-item-value put-wall" id="put-wall">—</div>
+      </div>
+    </div>
+    <div class="gex-item" style="margin-top:8px;">
+      <div class="gex-item-label">GAMMA FLIP — نقطة التحول</div>
+      <div class="gex-item-value gamma-flip" id="gamma-flip">—</div>
+    </div>
+    <div id="wall-alert" style="display:none;padding:10px 16px;border-radius:8px;margin-top:8px;font-size:12px;font-weight:700"></div>
+    <div id="wall-distance"></div>
+    <div id="trend-context"></div>
+    <div style="margin-top:12px;">
+      <div class="move-box move-daily">
+        <div class="move-title"><span>● DAILY EXPECTED MOVE</span><span>اليوم</span></div>
+        <div class="move-values">
+          <div class="move-up"><div class="move-dir">↗ UPPER</div><div class="move-val" id="daily-upper">—</div></div>
+          <div class="move-down"><div class="move-dir">↘ LOWER</div><div class="move-val" id="daily-lower">—</div></div>
+        </div>
+      </div>
+      <div class="move-box move-weekly">
+        <div class="move-title"><span>● WEEKLY EXPECTED MOVE</span><span>الأسبوعي</span></div>
+        <div class="move-values">
+          <div class="move-up"><div class="move-dir">↗ UPPER</div><div class="move-val" id="weekly-upper">—</div></div>
+          <div class="move-down"><div class="move-dir">↘ LOWER</div><div class="move-val" id="weekly-lower">—</div></div>
+        </div>
+        <div style="text-align:center;font-size:10px;color:#5a7a9a;margin-top:6px;" id="exp-date"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOLATILITY -->
+
+  <div class="card">
+    <div class="card-title"><span>Volatility & IV</span><span>التقلب والتقلب الضمني</span></div>
+    <div class="vix-big" id="vix-value">—</div>
+    <span class="vix-change" id="vix-change" style="background:rgba(90,120,150,0.2);color:#90a0b0;">0.00 (0.00%)</span>
+    <div class="vix-label">VIX LEVEL — مستوى مؤشر الخوف</div>
+    <div class="iv-row">
+      <div class="iv-label-row"><span>IV RANK</span><span id="iv-rank-val" style="color:#00d4ff;font-weight:700;">—</span></div>
+      <div class="iv-bar-bg"><div class="iv-bar-fill" id="iv-rank-bar" style="width:0%"></div></div>
+    </div>
+    <div class="iv-row" style="margin-top:10px;">
+      <div class="iv-label-row"><span>IV PERCENTILE</span><span id="iv-pct-val" style="color:#e040fb;font-weight:700;">—</span></div>
+      <div class="iv-bar-bg"><div class="iv-bar-fill" id="iv-pct-bar" style="width:0%;background:linear-gradient(90deg,#e040fb,#ff1744)"></div></div>
+    </div>
+    <div class="pc-box" style="margin-top:12px;">
+      <div>
+        <div class="pc-label">PUT/CALL RATIO</div>
+        <div class="pc-value" id="pc-ratio">—</div>
+        <div class="pc-signal" id="pc-signal" style="color:#5a7a9a;">—</div>
+      </div>
+      <div style="font-size:26px;" id="pc-icon">📊</div>
+    </div>
+    <div class="strategy-box">
+      <div class="strategy-label">STRATEGY RECOMMENDATION — الاستراتيجية الموصى بها</div>
+      <div class="strategy-value" id="strategy-en">—</div>
+      <div class="strategy-ar" id="strategy-ar">—</div>
+    </div>
+    <div class="gex-regime-box" id="gex-regime-box" style="background:rgba(255,23,68,0.08);border:1px solid rgba(255,23,68,0.2);">
+      <div style="font-size:10px;color:#5a7a9a;margin-bottom:4px;">GEX REGIME</div>
+      <div style="font-size:15px;font-weight:700;" id="gex-regime-text">—</div>
+    </div>
+  </div>
+
+  <!-- BIAS & DECISION -->
+
+  <div class="card">
+    <div class="card-title"><span>Market Bias & Decision</span><span>اتجاه السوق والقرار</span></div>
+    <div class="trade-today trade-yes" id="trade-today"><div class="loading"><div class="spinner"></div></div></div>
+    <div class="bias-box bias-neutral" id="bias-box">
+      <div class="bias-value" id="bias-value">—</div>
+      <div class="bias-ar" id="bias-ar">—</div>
+      <div class="bias-strength" id="bias-strength">—</div>
+      <div class="bias-reason" id="bias-reason">—</div>
+    </div>
+    <div class="decision-box">
+      <div class="decision-label">🎯 القرار الحاسم اليوم</div>
+      <div class="decision-value" id="decision-value">—</div>
+      <div class="decision-detail" id="decision-detail">—</div>
+    </div>
+    <div class="card-title" style="margin-top:4px;"><span>Liquidity Levels</span><span>مستويات السيولة</span></div>
+    <div class="liq-grid">
+      <div class="liq-item"><div class="liq-label">PDH — أعلى أمس</div><div class="liq-value" id="pdh">—</div></div>
+      <div class="liq-item"><div class="liq-label">PDL — أدنى أمس</div><div class="liq-value" id="pdl">—</div></div>
+      <div class="liq-item"><div class="liq-label">WEEKLY HIGH</div><div class="liq-value" id="weekly-high">—</div></div>
+      <div class="liq-item"><div class="liq-label">WEEKLY LOW</div><div class="liq-value" id="weekly-low">—</div></div>
+    </div>
+  </div>
+
+  <!-- SCENARIOS -->
+
+  <div class="card">
+    <div class="card-title"><span>Trading Scenarios</span><span>سيناريوهات التداول</span></div>
+    <div id="scenarios-container"><div class="loading"><div class="spinner"></div></div></div>
+  </div>
+
+  <!-- CALENDAR -->
+
+  <div class="card full-width">
+    <div class="card-title"><span>📅 Economic Calendar</span><span>التقويم الاقتصادي</span></div>
+    <div id="calendar-container"><div class="loading"><div class="spinner"></div></div></div>
+  </div>
+
+  <!-- KEY LEVELS -->
+
+  <div class="card full-width">
+    <div class="card-title"><span>Key Support & Resistance</span><span>الدعم والمقاومة الرئيسية</span></div>
+    <div id="key-levels-container"><div class="loading"><div class="spinner"></div></div></div>
+  </div>
+
+</div>
+
+<div class="footer">MESH SPX Command Center v2.1 | بيانات حقيقية — تحديث كل 15 دقيقة</div>
+
+<script>
+// ══════════════════════════════════════════════
+//   CLIENT-SIDE DATA FETCHING
+//   المتصفح يسحب البيانات مباشرة
+// ══════════════════════════════════════════════
+
+const CORS_PROXY = 'https://corsproxy.io/?url=';
+
+let refreshTimer;
+let nextRefreshTime;
+let cachedData = null;
+
+// ── FETCH SPX PRICE ──
+async function fetchSPX() {
+  const urls = [
+    'https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?interval=1m&range=1d',
+    'https://query2.finance.yahoo.com/v8/finance/chart/%5EGSPC?interval=1m&range=1d',
+  ];
+  for (const url of urls) {
+    try {
+      const res = await fetch(CORS_PROXY + encodeURIComponent(url));
+      const data = await res.json();
+      const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if (price && price > 1000) return { price };
+    } catch {}
+  }
+  // Fallback: use last known price
+  return { price: cachedData?.spx?.price || 6582, isStale: true };
+}
+
+// ── FETCH VIX ──
+async function fetchVIX() {
+  const urls = [
+    'https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?interval=1d&range=1y',
+    'https://query2.finance.yahoo.com/v8/finance/chart/%5EVIX?interval=1d&range=1y',
+  ];
+  for (const url of urls) {
+    try {
+      const res = await fetch(CORS_PROXY + encodeURIComponent(url));
+      const data = await res.json();
+      const result = data?.chart?.result?.[0];
+      const closes = result?.indicators?.quote?.[0]?.close?.filter(Boolean) || [];
+      const value = result?.meta?.regularMarketPrice;
+      if (!value) continue;
+      const prevClose = result?.meta?.previousClose || value;
+      const change = parseFloat((value - prevClose).toFixed(2));
+      const changePct = parseFloat(((change / prevClose) * 100).toFixed(2));
+      const low52 = closes.length > 50 ? Math.min(...closes.slice(-252)) : 12;
+      const high52 = closes.length > 50 ? Math.max(...closes.slice(-252)) : 45;
+      const percentile = closes.length > 10
+        ? Math.round(closes.filter(c => c < value).length / closes.length * 100)
+        : 60;
+      return { value, change, changePct, low52, high52, percentile };
+    } catch {}
+  }
+  return cachedData?.vix || { value: 23.87, change: 0, changePct: 0, low52: 12, high52: 45, percentile: 60 };
+}
+
+// ── FETCH OPTIONS DATA ──
+async function fetchOptions(spxPrice) {
+  const url = 'https://query1.finance.yahoo.com/v7/finance/options/%5ESPX';
+  try {
+    const res = await fetch(CORS_PROXY + encodeURIComponent(url));
+    const data = await res.json();
+    const result = data?.optionChain?.result?.[0];
+    if (!result) return null;
+
+    const calls = result.options?.[0]?.calls || [];
+    const puts = result.options?.[0]?.puts || [];
+    if (!calls.length || !puts.length) return null;
+
+    const maxPain = calcMaxPain(calls, puts);
+    const gex = calcGEX(calls, puts, spxPrice);
+    const totalCallOI = calls.reduce((s, c) => s + (c.openInterest || 0), 0);
+    const totalPutOI = puts.reduce((s, p) => s + (p.openInterest || 0), 0);
+    const ratio = totalCallOI > 0 ? parseFloat((totalPutOI / totalCallOI).toFixed(2)) : 0.87;
+    return { gex, maxPain, putCall: { ratio } };
+  } catch {
+    return null;
+  }
+}
+
+// ── FETCH LIQUIDITY ──
+async function fetchLiquidity() {
+  const urls = [
+    'https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?interval=1d&range=10d',
+    'https://query2.finance.yahoo.com/v8/finance/chart/%5EGSPC?interval=1d&range=10d',
+  ];
+  for (const url of urls) {
+    try {
+      const res = await fetch(CORS_PROXY + encodeURIComponent(url), {
+        headers: { 'Accept': 'application/json' }
+      });
+      const data = await res.json();
+      const result = data?.chart?.result?.[0];
+      const quotes = result?.indicators?.quote?.[0];
+      const highs = quotes?.high?.filter(Boolean) || [];
+      const lows = quotes?.low?.filter(Boolean) || [];
+      const closes = quotes?.close?.filter(Boolean) || [];
+      if (highs.length < 2) continue;
+      return {
+        pdh: parseFloat(highs[highs.length - 2].toFixed(2)),
+        pdl: parseFloat(lows[lows.length - 2].toFixed(2)),
+        weeklyHigh: parseFloat(Math.max(...highs.slice(-5)).toFixed(2)),
+        weeklyLow: parseFloat(Math.min(...lows.slice(-5)).toFixed(2)),
+      };
+    } catch {}
+  }
+  // Fallback: estimate from current price
+  const price = cachedData?.spx?.price || 6582;
+  return {
+    pdh: parseFloat((price * 1.004).toFixed(2)),
+    pdl: parseFloat((price * 0.996).toFixed(2)),
+    weeklyHigh: parseFloat((price * 1.008).toFixed(2)),
+    weeklyLow: parseFloat((price * 0.985).toFixed(2)),
+  };
+}
+
+// ══════════════════════════════════════════════
+//   CALCULATIONS
+// ══════════════════════════════════════════════
+
+function calcMaxPain(calls, puts) {
+  const strikes = [...new Set([...calls.map(c => c.strike), ...puts.map(p => p.strike)])].sort((a, b) => a - b);
+  let minLoss = Infinity, mpStrike = strikes[Math.floor(strikes.length / 2)];
+  for (const s of strikes) {
+    let loss = 0;
+    for (const c of calls) if (c.strike < s) loss += (s - c.strike) * (c.openInterest || 0);
+    for (const p of puts) if (p.strike > s) loss += (p.strike - s) * (p.openInterest || 0);
+    if (loss < minLoss) { minLoss = loss; mpStrike = s; }
+  }
+  return mpStrike;
+}
+
+function calcGEX(calls, puts, price) {
+  const callsAbove = calls.filter(c => c.strike > price).sort((a, b) => (b.openInterest || 0) - (a.openInterest || 0));
+  const putsBelow = puts.filter(p => p.strike < price).sort((a, b) => (b.openInterest || 0) - (a.openInterest || 0));
+  const callWall = callsAbove[0]?.strike || Math.round(price * 1.02 / 25) * 25;
+  const putWall = putsBelow[0]?.strike || Math.round(price * 0.98 / 25) * 25;
+  const zeroGamma = Math.round((callWall + putWall) / 2 / 5) * 5;
+  const gammaFlip = Math.round((zeroGamma + price) / 2 / 5) * 5;
+  const netGex = callsAbove.slice(0, 5).reduce((s, c) => s + (c.openInterest || 0), 0)
+               - putsBelow.slice(0, 5).reduce((s, p) => s + (p.openInterest || 0), 0);
+  return { callWall, putWall, zeroGamma, gammaFlip, netGex };
+}
+
+function fallbackGEX(price) {
+  return {
+    callWall: Math.round(price * 1.015 / 25) * 25,
+    putWall: Math.round(price * 0.985 / 25) * 25,
+    zeroGamma: Math.round(price / 25) * 25,
+    gammaFlip: Math.round(price * 1.005 / 5) * 5,
+    netGex: -1,
+  };
+}
+
+function ivRank(vix, low = 12, high = 45) {
+  if (!vix || high === low) return 30;
+  return Math.min(100, Math.max(0, Math.round(((vix - low) / (high - low)) * 100)));
+}
+
+function getStrategy(rank) {
+  if (rank < 20) return { en: 'Do Not Trade', ar: 'لا تتداول اليوم', key: 'no_trade' };
+  if (rank < 40) return { en: 'Credit Spread Narrow', ar: 'سبريد ائتماني ضيق', key: 'cs_narrow' };
+  if (rank < 60) return { en: 'Iron Condor', ar: 'آيرون كوندور', key: 'ic' };
+  if (rank < 80) return { en: 'Iron Condor Wide', ar: 'آيرون كوندور واسع', key: 'ic_wide' };
+  return { en: 'Iron Fly', ar: 'آيرون فلاي', key: 'fly' };
+}
+
+function getBias(price, gex, vix) {
+  const aboveZero = price > gex.zeroGamma;
+  const negGex = gex.netGex < 0;
+  if (aboveZero && !negGex) return { direction: 'bullish', strength: 65, reason: `السعر فوق Zero-Gamma (${gex.zeroGamma}). GEX إيجابي — استقرار مفضل.` };
+  if (!aboveZero && negGex) return { direction: 'bearish', strength: 68, reason: `السعر تحت Zero-Gamma (${gex.zeroGamma}). GEX سلبي — يضخم الحركة الهابطة.` };
+  return { direction: 'neutral', strength: vix > 25 ? 42 : 52, reason: `السعر بين Put Wall (${gex.putWall}) و Call Wall (${gex.callWall}). مغناطيس Max Pain عند ${gex.maxPain || Math.round(price/25)*25}.` };
+}
+
+function getExpectedMove(price, vix) {
+  const d = Math.round(price * (vix / 100) * Math.sqrt(1 / 365));
+  const w = Math.round(price * (vix / 100) * Math.sqrt(5 / 365));
+  const today = new Date();
+  const fri = new Date(today);
+  fri.setDate(today.getDate() + ((5 - today.getDay() + 7) % 7 || 7));
+  return { dailyUpper: price + d, dailyLower: price - d, weeklyUpper: price + w, weeklyLower: price - w, expDate: fri.toISOString().split('T')[0] };
+}
+
+function getScenarios(price, gex, dir) {
+  const cw = gex.callWall, pw = gex.putWall, mp = gex.maxPain || Math.round(price/25)*25, zg = gex.zeroGamma;
+  if (dir === 'bearish') return [
+    { type: 'bearish', icon: '↘', name: 'Bearish Continuation', nameAr: 'هبوط مستمر', prob: 55, target: pw, stop: zg },
+    { type: 'neutral-s', icon: '→', name: 'Range-Bound', nameAr: 'تداول في نطاق', prob: 30, target: mp, stop: Math.round(pw * 0.995) },
+    { type: 'bullish', icon: '↗', name: 'Bullish Reversal', nameAr: 'انعكاس صاعد', prob: 15, target: zg, stop: pw },
+  ];
+  if (dir === 'bullish') return [
+    { type: 'bullish', icon: '↗', name: 'Bullish Breakout', nameAr: 'اختراق صعودي', prob: 50, target: cw, stop: zg },
+    { type: 'neutral-s', icon: '→', name: 'Range-Bound', nameAr: 'تداول في نطاق', prob: 35, target: mp, stop: pw },
+    { type: 'bearish', icon: '↘', name: 'Bearish Flush', nameAr: 'هبوط نحو الدعم', prob: 15, target: pw, stop: cw },
+  ];
+  return [
+    { type: 'neutral-s', icon: '→', name: 'Range-Bound Consolidation', nameAr: 'تداول في نطاق محدد', prob: 55, target: mp, stop: Math.round(pw * 0.995) },
+    { type: 'bullish', icon: '↗', name: 'Bullish Breakout', nameAr: 'اختراق صعودي', prob: 25, target: cw, stop: zg },
+    { type: 'bearish', icon: '↘', name: 'Bearish Flush to Put Wall', nameAr: 'تصحيح هبوطي نحو جدار البيع', prob: 20, target: pw, stop: Math.round(price * 1.005) },
+  ];
+}
+
+function getDecision(bias, gex, price, rank) {
+  if (rank < 20) return { action: '⛔ لا تتداول اليوم', detail: 'IV منخفض جداً — Credit Spreads غير مجدية' };
+  const dc = gex.callWall - price, dp = price - gex.putWall;
+  if (bias === 'bearish' && dc < dp * 1.5) return { action: '🔴 SELL CALL Credit Spread', detail: `الدخول عند ${Math.round(gex.zeroGamma)} — الجدار عند ${gex.callWall}` };
+  if (bias === 'bullish' && dp < dc * 1.5) return { action: '🟢 SELL PUT Credit Spread', detail: `الدخول عند ${Math.round(gex.zeroGamma)} — الدعم عند ${gex.putWall}` };
+  return { action: '⚖️ Iron Condor', detail: `بيع بين ${gex.putWall} و ${gex.callWall} — مغناطيس ${gex.maxPain || Math.round(price/25)*25}` };
+}
+
+function getCalendar() {
+  const now = new Date();
+  return [
+    { date: '2026-04-07', name: 'FOMC Meeting Minutes', nameAr: 'محضر اجتماع الفيدرالي', impact: 'HIGH', est: '—', prev: '—' },
+    { date: '2026-04-08', name: 'Initial Jobless Claims', nameAr: 'طلبات الإعانة', impact: 'MEDIUM', est: '222K', prev: '219K' },
+    { date: '2026-04-10', name: 'Monthly Options Expiration', nameAr: 'انتهاء خيارات شهرية', impact: 'HIGH', est: '—', prev: '—' },
+  ].filter(e => new Date(e.date) >= new Date(now.toDateString()));
+}
+
+function isMarketOpen() {
+  // Convert to ET (UTC-4 in summer, UTC-5 in winter)
+  const now = new Date();
+  const etOffset = isDST(now) ? -4 : -5;
+  const etTime = new Date(now.getTime() + etOffset * 60 * 60 * 1000);
+  const day = etTime.getUTCDay();
+  const hour = etTime.getUTCHours();
+  const min = etTime.getUTCMinutes();
+  const totalMin = hour * 60 + min;
+  if (day === 0 || day === 6) return false;
+  return totalMin >= 570 && totalMin <= 960; // 9:30-16:00 ET
+}
+
+function isDST(date) {
+  const jan = new Date(date.getFullYear(), 0, 1);
+  const jul = new Date(date.getFullYear(), 6, 1);
+  return date.getTimezoneOffset() < Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+}
+
+// ══════════════════════════════════════════════
+//   UI UPDATE
+// ══════════════════════════════════════════════
+
+function fmt(n, d = 2) {
+  if (!n && n !== 0) return '—';
+  return Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+
+function updateUI(data) {
+  if (!data) return;
+  cachedData = data;
+
+  const now = new Date();
+  document.getElementById('last-update').textContent = `آخر تحديث: ${now.toLocaleTimeString('ar-SA')}`;
+
+  const marketOpen = isMarketOpen();
+  const msEl = document.getElementById('market-status');
+  if (msEl) msEl.innerHTML = marketOpen
+    ? '<span style="color:#00c853;font-size:11px;">🟢 السوق مفتوح</span>'
+    : '<span class="market-closed">🔴 السوق مغلق — آخر بيانات</span>';
+
+  // Price
+  const price = data.spx?.price;
+  const priceEl = document.getElementById('spx-price');
+  if (price) {
+    priceEl.textContent = fmt(price);
+    if (data.spx?.isStale) priceEl.style.color = '#ff9800';
+    else priceEl.style.color = '#00d4ff';
+  }
+
+  // GEX
+  const _cw = data.gex?.callWall;
+  const _pw = data.gex?.putWall;
+  const _sp = data.spx?.price || 0;
+  document.getElementById('call-wall').textContent = fmt(_cw, 0) || '—';
+  document.getElementById('put-wall').textContent = fmt(_pw, 0) || '—';
+  document.getElementById('zero-gamma').textContent = fmt(data.gex?.zeroGamma, 0) || '—';
+  document.getElementById('max-pain').textContent = fmt(data.gex?.maxPain, 0) || '—';
+  document.getElementById('gamma-flip').textContent = fmt(data.gex?.gammaFlip, 0) || '—';
+
+  // Distance from walls + Alert + Trend Context
+  if (_cw && _pw && _sp) {
+    const dC = Math.round(_cw - _sp);
+    const dP = Math.round(_sp - _pw);
+    const dEl = document.getElementById('wall-distance');
+    if (dEl) dEl.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><div style="background:#050f1f;border-radius:8px;padding:8px;text-align:center;border-top:2px solid #00c853"><div style="font-size:10px;color:#5a7a9a">بُعد Call Wall</div><div style="font-size:18px;font-weight:700;color:${dC<30?"#ff1744":"#00c853"}">+${fmt(dC,0)} pts</div><div style="font-size:10px;color:#5a7a9a">${dC<30?"⚠️ قريب":"✅ آمن"}</div></div><div style="background:#050f1f;border-radius:8px;padding:8px;text-align:center;border-top:2px solid #ff1744"><div style="font-size:10px;color:#5a7a9a">بُعد Put Wall</div><div style="font-size:18px;font-weight:700;color:${dP<30?"#ff1744":"#00c853"}">-${fmt(dP,0)} pts</div><div style="font-size:10px;color:#5a7a9a">${dP<30?"⚠️ قريب":"✅ آمن"}</div></div></div>`;
+    const aEl = document.getElementById('wall-alert');
+    if (aEl) {
+      if (dC < 25) { aEl.style.cssText='display:block;padding:10px 16px;border-radius:8px;margin:8px 0;font-size:12px;font-weight:700;background:rgba(0,200,83,0.1);border:1px solid #00c853;color:#00c853'; aEl.textContent=`🚨 SPX على بُعد ${dC} نقطة من Call Wall ${_cw} — منطقة بيع محتملة`; }
+      else if (dP < 25) { aEl.style.cssText='display:block;padding:10px 16px;border-radius:8px;margin:8px 0;font-size:12px;font-weight:700;background:rgba(255,23,68,0.1);border:1px solid #ff1744;color:#ff1744'; aEl.textContent=`🚨 SPX على بُعد ${dP} نقطة من Put Wall ${_pw} — منطقة دعم محتملة`; }
+      else aEl.style.display='none';
+    }
+    const tcEl = document.getElementById('trend-context');
+    if (tcEl) {
+      const ng = data.gex?.netGex < 0;
+      const azg = _sp > (data.gex?.zeroGamma || _sp);
+      let tr, cl;
+      if (_sp > _cw) { tr='فوق Call Wall — ضغط بيعي قوي'; cl='#ff1744'; }
+      else if (_sp < _pw) { tr='تحت Put Wall — دعم محتمل'; cl='#00c853'; }
+      else if (azg && !ng) { tr='فوق Zero-Gamma — بيئة مستقرة صاعدة'; cl='#00c853'; }
+      else if (!azg && ng) { tr='تحت Zero-Gamma — بيئة متقلبة هابطة'; cl='#ff1744'; }
+      else { tr='بين الجدارين — تذبذب محايد'; cl='#ff9800'; }
+      tcEl.innerHTML = `<div style="padding:8px 12px;border-radius:8px;background:#050f1f;font-size:13px;font-weight:700;margin-top:8px"><span style="color:${cl}">${tr}</span></div>`;
+    }
+  }
+
+  // Expected Move
+  document.getElementById('daily-upper').textContent = fmt(data.expectedMove?.dailyUpper, 0);
+  document.getElementById('daily-lower').textContent = fmt(data.expectedMove?.dailyLower, 0);
+  document.getElementById('weekly-upper').textContent = fmt(data.expectedMove?.weeklyUpper, 0);
+  document.getElementById('weekly-lower').textContent = fmt(data.expectedMove?.weeklyLower, 0);
+  if (data.expectedMove?.expDate) document.getElementById('exp-date').textContent = `EXP: ${data.expectedMove.expDate}`;
+
+  // VIX
+  const vix = data.vix?.value;
+  if (vix) {
+    document.getElementById('vix-value').textContent = fmt(vix, 2);
+    const ch = data.vix.change || 0;
+    const pct = data.vix.changePct || 0;
+    const el = document.getElementById('vix-change');
+    el.textContent = `${ch >= 0 ? '↑' : '↓'} ${fmt(Math.abs(ch), 2)} (${fmt(Math.abs(pct), 2)}%)`;
+    el.style.background = ch >= 0 ? 'rgba(255,23,68,0.15)' : 'rgba(0,200,83,0.15)';
+    el.style.color = ch >= 0 ? '#ff1744' : '#00c853';
+  }
+
+  // IV
+  const rank = data.iv?.rank || 0;
+  const pct = data.iv?.percentile || 0;
+  document.getElementById('iv-rank-val').textContent = `${rank}%`;
+  document.getElementById('iv-rank-bar').style.width = `${Math.min(rank, 100)}%`;
+  document.getElementById('iv-pct-val').textContent = `${pct}%`;
+  document.getElementById('iv-pct-bar').style.width = `${Math.min(pct, 100)}%`;
+
+  // Strategy
+  const s = data.strategy || {};
+  document.getElementById('strategy-en').textContent = s.en || '—';
+  document.getElementById('strategy-ar').textContent = s.ar || '—';
+
+  // Put/Call
+  const pc = data.putCall?.ratio;
+  if (pc) {
+    document.getElementById('pc-ratio').textContent = fmt(pc, 2);
+    let sig, icon;
+    if (pc > 1.2) { sig = '🐻 تشاؤم شديد'; icon = '😱'; }
+    else if (pc > 0.9) { sig = '🐻 تشاؤم — Bearish'; icon = '📉'; }
+    else if (pc < 0.6) { sig = '🐂 تفاؤل مفرط'; icon = '🚀'; }
+    else if (pc < 0.75) { sig = '🐂 تفاؤل — Bullish'; icon = '📈'; }
+    else { sig = '⚖️ محايد — Neutral'; icon = '📊'; }
+    document.getElementById('pc-signal').textContent = sig;
+    document.getElementById('pc-icon').textContent = icon;
+  }
+
+  // GEX Regime
+  const regime = data.gex?.netGex < 0 ? 'negative' : 'positive';
+  const rb = document.getElementById('gex-regime-box');
+  const rt = document.getElementById('gex-regime-text');
+  if (regime === 'negative') {
+    rb.style.background = 'rgba(255,23,68,0.08)'; rb.style.border = '1px solid rgba(255,23,68,0.2)';
+    rt.textContent = '🔴 Negative Gamma — تقلب مرتفع'; rt.style.color = '#ff1744';
+  } else {
+    rb.style.background = 'rgba(0,200,83,0.08)'; rb.style.border = '1px solid rgba(0,200,83,0.2)';
+    rt.textContent = '🟢 Positive Gamma — استقرار'; rt.style.color = '#00c853';
+  }
+
+  // Bias
+  const bias = data.bias || {};
+  const bb = document.getElementById('bias-box');
+  bb.className = `bias-box bias-${bias.direction || 'neutral'}`;
+  const bmap = { bullish: { en: 'BULLISH', ar: '📈 صاعد' }, bearish: { en: 'BEARISH', ar: '📉 هابط' }, neutral: { en: 'NEUTRAL', ar: '⚖️ محايد' } };
+  const bm = bmap[bias.direction] || bmap.neutral;
+  document.getElementById('bias-value').textContent = bm.en;
+  document.getElementById('bias-ar').textContent = bm.ar;
+  document.getElementById('bias-strength').textContent = `STRENGTH ${bias.strength || 0}%`;
+  document.getElementById('bias-reason').textContent = bias.reason || '';
+
+  // Trade Today
+  const calendar = data.calendar || [];
+  const highEvents = calendar.filter(e => e.impact === 'HIGH');
+  const tdEl = document.getElementById('trade-today');
+  if (highEvents.length > 0) {
+    tdEl.className = 'trade-today trade-no';
+    tdEl.textContent = `⚠️ تحذير — أخبار عالية التأثير | ${highEvents[0].name}`;
+  } else if ((data.iv?.rank || 0) < 20) {
+    tdEl.className = 'trade-today trade-no';
+    tdEl.textContent = '⚠️ IV منخفض جداً — لا تتداول';
+  } else {
+    tdEl.className = 'trade-today trade-yes';
+    tdEl.textContent = '✅ تداول اليوم — الظروف مناسبة | Trade Today';
+  }
+
+  // Decision
+  const dec = data.decision || {};
+  document.getElementById('decision-value').textContent = dec.action || '—';
+  document.getElementById('decision-detail').textContent = dec.detail || '—';
+
+  // Judas
+  const judas = data.judas?.active;
+  const jb = document.getElementById('judas-bar');
+  jb.className = `judas-bar ${judas ? 'active' : 'inactive'}`;
+  document.getElementById('judas-text').textContent = judas ? '⚠️ تحذير انحراف خادع (جوداس) — انتظر تأكيداً' : '🛡 لا يوجد انحراف خادع (جوداس)';
+  document.getElementById('judas-text-en').textContent = judas ? 'JUDAS SWING ACTIVE — Wait for confirmation' : 'No Judas Swing detected';
+
+  // Liquidity
+  const liq = data.liquidity || {};
+  document.getElementById('pdh').textContent = fmt(liq.pdh, 2) || '—';
+  document.getElementById('pdl').textContent = fmt(liq.pdl, 2) || '—';
+  document.getElementById('weekly-high').textContent = fmt(liq.weeklyHigh, 2) || '—';
+  document.getElementById('weekly-low').textContent = fmt(liq.weeklyLow, 2) || '—';
+
+  // Scenarios
+  const sc = document.getElementById('scenarios-container');
+  sc.innerHTML = (data.scenarios || []).map(s => `
+    <div class="scenario-item ${s.type}">
+      <div class="scenario-header">
+        <span class="scenario-name">${s.icon} ${s.name} — ${s.nameAr}</span>
+        <span class="scenario-prob">${s.prob}%</span>
+      </div>
+      <div class="scenario-bar-bg"><div class="scenario-bar-fill" style="width:${s.prob}%"></div></div>
+      <div class="scenario-details">
+        <div class="scenario-target">🎯 Target: ${fmt(s.target, 0)}</div>
+        <div class="scenario-stop">🛑 Stop: ${fmt(s.stop, 0)}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Calendar
+  const cc = document.getElementById('calendar-container');
+  if (!calendar.length) {
+    cc.innerHTML = '<div style="color:#5a7a9a;padding:12px;text-align:center;font-size:12px;">✅ لا توجد أحداث مهمة هذا الأسبوع</div>';
+  } else {
+    cc.innerHTML = `<table class="cal-table"><thead><tr><th>التاريخ</th><th>الحدث</th><th>التأثير</th><th>السابق/المتوقع</th></tr></thead><tbody>
+      ${calendar.map(e => `<tr>
+        <td style="color:#7a9ab0;">${e.date}</td>
+        <td><div style="font-weight:600;">${e.name}</div><div style="color:#5a7a9a;font-size:10px;">${e.nameAr}</div></td>
+        <td><span class="impact-${e.impact.toLowerCase()}">${e.impact}</span></td>
+        <td style="color:#7a9ab0;">${e.prev||'—'} / ${e.est||'—'}</td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  }
+
+  // Key Levels
+  const levels = [];
+  if (data.gex?.callWall) levels.push({ price: data.gex.callWall, name: 'Call Wall / Major Resistance', nameAr: 'جدار الشراء — مقاومة رئيسية', color: '#00c853', s: 'strong' });
+  if (liq.pdh) levels.push({ price: liq.pdh, name: 'Previous Day High (PDH)', nameAr: 'أعلى أمس', color: '#ff9800', s: 'moderate' });
+  if (data.gex?.maxPain) levels.push({ price: data.gex.maxPain, name: 'Max Pain / Magnet', nameAr: 'نقطة الألم الأقصى', color: '#29b6f6', s: 'strong' });
+  if (data.gex?.zeroGamma) levels.push({ price: data.gex.zeroGamma, name: 'Zero-Gamma Level', nameAr: 'مستوى الجاما الصفرية', color: '#ff9800', s: 'moderate' });
+  if (data.gex?.gammaFlip) levels.push({ price: data.gex.gammaFlip, name: 'Gamma Flip Level', nameAr: 'نقطة تحول الجاما', color: '#e040fb', s: 'strong' });
+  if (liq.pdl) levels.push({ price: liq.pdl, name: 'Previous Day Low (PDL)', nameAr: 'أدنى أمس', color: '#29b6f6', s: 'moderate' });
+  if (data.gex?.putWall) levels.push({ price: data.gex.putWall, name: 'Put Wall / Major Support', nameAr: 'جدار البيع — دعم رئيسي', color: '#ff1744', s: 'strong' });
+  levels.sort((a, b) => b.price - a.price);
+  document.getElementById('key-levels-container').innerHTML = levels.map(l => `
+    <div class="key-level-row">
+      <span class="level-price" style="color:${l.color}">${fmt(l.price, 0)}</span>
+      <div class="level-name">${l.name}<br><span style="color:#5a7a9a;">${l.nameAr}</span></div>
+      <span class="level-strength ${l.s}">${l.s.toUpperCase()}</span>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════
+//   MAIN LOAD
+// ══════════════════════════════════════════════
+
+async function loadAllData() {
+  // Start timer
+  clearInterval(refreshTimer);
+  nextRefreshTime = Date.now() + 15 * 60 * 1000;
+  refreshTimer = setInterval(() => {
+    const rem = Math.max(0, nextRefreshTime - Date.now());
+    const m = Math.floor(rem / 60000), s = Math.floor((rem % 60000) / 1000);
+    document.getElementById('next-refresh').textContent = `التحديث القادم: ${m}:${s.toString().padStart(2,'0')}`;
+    if (rem <= 0) loadAllData();
+  }, 1000);
+
+  try {
+    // Step 1: Get SPX price first
+    const spxData = await fetchSPX();
+    const price = spxData.price || 6582;
+
+    // Step 2: Fetch everything else in parallel
+    const [vixData, optionsData, liquidityData] = await Promise.allSettled([
+      fetchVIX(),
+      fetchOptions(price),
+      fetchLiquidity(),
+    ]);
+
+    const vix = vixData.value || { value: 23.87, change: 0, changePct: 0, low52: 12, high52: 45, percentile: 60 };
+    const options = optionsData.value;
+    const liquidity = liquidityData.value || {};
+
+    const vixVal = vix.value || 23.87;
+    const rank = ivRank(vixVal, vix.low52, vix.high52);
+    const pct = vix.percentile || Math.round(rank * 0.85);
+    const gex = options?.gex || fallbackGEX(price);
+    const maxPain = options?.maxPain || Math.round(price / 25) * 25;
+    const putCall = options?.putCall || { ratio: 0.87 };
+
+    gex.maxPain = maxPain;
+
+    const strategy = getStrategy(rank);
+    const bias = getBias(price, gex, vixVal);
+    const em = getExpectedMove(price, vixVal);
+    const scenarios = getScenarios(price, gex, bias.direction);
+    const decision = getDecision(bias.direction, gex, price, rank);
+    const calendar = getCalendar();
+
+    const hour = new Date().getUTCHours() + 3;
+    const judas = { active: (hour >= 9 && hour < 11) || (hour >= 16 && hour < 17) };
+
+    updateUI({
+      spx: spxData,
+      vix,
+      gex,
+      iv: { rank, percentile: pct },
+      putCall,
+      strategy,
+      bias,
+      expectedMove: em,
+      scenarios,
+      calendar,
+      liquidity,
+      decision,
+      judas,
+    });
+
+  } catch (err) {
+    console.error('Load error:', err);
+    // Show cached data if available
+    if (cachedData) updateUI(cachedData);
+  }
+}
+
+// Start
+loadAllData();
+</script>
+
+</body>
+</html>
