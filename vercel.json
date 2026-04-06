@@ -1,18 +1,1 @@
-{
-  "version": 2,
-  "functions": {
-    "api/market-data.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
-  "routes": [
-    {
-      "src": "/api/market-data",
-      "dest": "/api/market-data.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
-}
+
