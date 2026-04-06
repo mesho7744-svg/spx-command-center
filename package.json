@@ -1,9 +1,13 @@
 {
   "name": "spx-command-center",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "MESH SPX Trading Command Center",
   "private": true,
+  "type": "module",
   "engines": {
     "node": "20.x"
+  },
+  "dependencies": {
+    "yahoo-finance2": "^2.13.3"
   }
 }
