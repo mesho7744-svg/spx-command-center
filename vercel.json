@@ -1,13 +1,1 @@
-{
-  "version": 2,
-  "routes": [
-    {
-      "src": "/api/market-data",
-      "dest": "/market-data.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
-}
+
